@@ -1,29 +1,23 @@
 module saw_led (input clk, output led);
-    parameter cycle = 24;
-    reg o1, o2, o3, o4, o5, o6, o7, o8;
+    parameter steps = 16;
 
-    reg [cycle:0] count;
+    reg [steps:0]over_bus;
+    reg [steps:0]pwm_bus;
+    reg [steps:0]count;
 
-    localparam base_time = (1 << cycle) / 8;
+    localparam cycle_bits = 26;
+    localparam cycle = 1 << cycle_bits;
+    localparam magic_number = 100;
 
-    over #(1 * base_time, cycle) over_1 (.clk(clk), .val(o1));
-	over #(2 * base_time, cycle) over_2 (.clk(clk), .val(o2));
-	over #(3 * base_time, cycle) over_3 (.clk(clk), .val(o3));
-	over #(4 * base_time, cycle) over_4 (.clk(clk), .val(o4));
-	over #(5 * base_time, cycle) over_5 (.clk(clk), .val(o5));
-	over #(6 * base_time, cycle) over_6 (.clk(clk), .val(o6));
-	over #(7 * base_time, cycle) over_7 (.clk(clk), .val(o7));
-	over #(8 * base_time, cycle) over_8 (.clk(clk), .val(o8));
+    genvar i;
+    generate
+        for (i = 0; i < steps; i=i+1) begin: gen_loop
+            // TODO: find logic that has better probability distribution :(
+            over #(cycle - (cycle / (i+1)), cycle_bits) brightness_step (.clk(clk), .val(over_bus[i]));
+        end
+    endgenerate
 
-    assign led =
-        (count[1] && o1) ||
-        (count[2] && o2) ||
-        (count[3] && o3) ||
-        (count[4] && o4) ||
-        (count[5] && o5) ||
-        (count[6] && o6) ||
-        (count[7] && o7) ||
-        (count[8] && o8);
+    assign led = |(count & over_bus);
 
     always @(posedge clk) count++;
 endmodule
