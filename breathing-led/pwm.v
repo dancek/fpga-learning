@@ -1,6 +1,7 @@
 module pwm
   #(parameter COUNTER_BITS = 8,
-    parameter DIM_BITS = 3,
+    parameter DIM_BITS = 4,
+    parameter DARK_THRESHOLD = 1 << (COUNTER_BITS-5)
   ) (
     input clk,
     input rst,
@@ -16,7 +17,7 @@ module pwm
     else
       counter = counter + 1;
 
-    pwm = (counter > min);
+    pwm = (counter + DARK_THRESHOLD > min);
   end
 
 endmodule

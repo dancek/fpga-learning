@@ -4,8 +4,8 @@ module chip (
     output LED_B
   );
 
-  localparam PWM_BITS = 8;
-  localparam CYCLE_BITS = 27;
+  localparam PWM_BITS = 16;
+  localparam CYCLE_BITS = 26;
 
   wire clk, rst, led;
 
@@ -34,9 +34,9 @@ module chip (
 
     tmp = counter[(CYCLE_BITS-1):(CYCLE_BITS-PWM_BITS)];
     if (counter[CYCLE_BITS])
-      min = tmp;
-    else
       min = ~tmp;
+    else
+      min = tmp;
   end
 
 	assign LED_R = led;
