@@ -5,12 +5,13 @@ module chip (
   );
 
   localparam PWM_BITS = 8;
-  localparam DIM_BITS = 3;
   localparam CYCLE_BITS = 27;
 
   wire clk, rst, led;
 
   reg [CYCLE_BITS : 0] counter;
+  reg [PWM_BITS-1 : 0] min;
+  reg [PWM_BITS-1 : 0] tmp;
 
   SB_HFOSC u_hfosc (
 		.CLKHFPU(1'b1),
@@ -21,7 +22,7 @@ module chip (
   pwm #(PWM_BITS) pwm (
     .clk(clk),
     .rst(rst),
-    .min(counter[(CYCLE_BITS-1):(CYCLE_BITS-PWM_BITS+DIM_BITS)]),
+    .min(min),
     .pwm(led)
   );
 
@@ -30,6 +31,12 @@ module chip (
       counter = 0;
     else
       counter = counter + 1;
+
+    tmp = counter[(CYCLE_BITS-1):(CYCLE_BITS-PWM_BITS)];
+    if (counter[CYCLE_BITS])
+      min = tmp;
+    else
+      min = ~tmp;
   end
 
 	assign LED_R = led;
