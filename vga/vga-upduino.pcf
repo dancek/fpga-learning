@@ -1,0 +1,6 @@
+set_io VSYNC 23
+set_io HSYNC 25
+
+set_io VGA_R 21
+set_io VGA_G 13
+set_io VGA_B 19
